@@ -1,143 +1,101 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "id": "bf28bb0f-2dc8-45dd-a325-cf78fc73c9fc",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "from sklearn.base import BaseEstimator, TransformerMixin\n",
-    "from sklearn.compose import ColumnTransformer\n",
-    "from sklearn.pipeline import Pipeline\n",
-    "from sklearn.preprocessing import OneHotEncoder, StandardScaler\n",
-    "from sklearn.impute import SimpleImputer\n",
-    "import pandas as pd\n",
-    "import numpy as np"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "496cc67e-c77b-4339-ae39-f287a6453a17",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# This is a scikit-learn model preprocessing pipeline\n",
-    "class churn_preprocessor(BaseEstimator, TransformerMixin):\n",
-    "    def __init__(self, drop_cols=None, corr_threshold=0.999, num_cols=None, cat_cols=None, remove_redundant=True):\n",
-    "        '''Remove redundant features'''\n",
-    "        self.drop_cols = drop_cols or []\n",
-    "        self.corr_threshold = corr_threshold\n",
-    "        self.num_cols = None if num_cols is None else list(num_cols)\n",
-    "        self.cat_cols = None if cat_cols is None else list(cat_cols)\n",
-    "        self.remove_redundant = remove_redundant\n",
-    "\n",
-    "        # Set in fit\n",
-    "        self.auto_drop_ = []\n",
-    "        self.kept_columns_ = []\n",
-    "        self.prep_ = None\n",
-    "        self.feature_names_ = []\n",
-    "        self.corr_matrix_ = None\n",
-    "\n",
-    "    def num_for_corr(self, df: pd.DataFrame) -> pd.DataFrame:\n",
-    "        '''Transform to numeric data to check correlation'''\n",
-    "        df.num = df.copy()\n",
-    "\n",
-    "        # Convert object/categorical\n",
-    "        for c in df_num.select_dtypes(include=[\"object\",\"category\"]).columns:\n",
-    "            df_num[c] = pd.Categorical(df_num[c]).codes\n",
-    "        return df_num.apply(pd.to_numeric, errors=\"coerce\")\n",
-    "\n",
-    "    def _infer_column_types(self, Xdf: pd.DataFrame):\n",
-    "        if self.num_cols is None or self.cat_cols is None:\n",
-    "            num = Xdf.select_dtypes(include=[np.number]).columns.tolist()\n",
-    "            cat = Xdf.columns.difference(num).tolist()\n",
-    "            if self.num_cols is None: self.num_cols = num\n",
-    "            if self.cat_cols is None: self.cat_cols = cat\n",
-    "            \n",
-    "    def _find_redundant(self, df_num: pd.DataFrame):\n",
-    "        if df_num.shape[1] <= 1:\n",
-    "            return []\n",
-    "        corr = df_num.corr(numeric_only=True).abs()\n",
-    "        self.corr_matrix_ = corr\n",
-    "        upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))\n",
-    "        to_drop = [col for col in upper.columns if any(upper[col] >= self.corr_threshold)]\n",
-    "        return to_drop\n",
-    "        \n",
-    "    def fit(self, X, y=None):\n",
-    "        Xdf = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(X)\n",
-    "        # Drop useless columns\n",
-    "        Xdf = Xdf.drop(columns=self.drop_cols, errors=\"ignore\")\n",
-    "        self._infer_column_types(Xdf)\n",
-    "\n",
-    "        # Remove highly correlated numeric columns\n",
-    "        self.auto_drop_ = []\n",
-    "        if self.remove_redundant and len(self.num_cols) > 1:\n",
-    "            Xnum_for_corr = self.num_for_corr(Xdf[self.num_cols]).select_dtypes(include=[np.number])\n",
-    "            redundant = self._find_redundant(Xnum_for_corr)\n",
-    "            self.auto_drop_ = redundant\n",
-    "\n",
-    "        # Kept columns\n",
-    "        crop_set = set(self.drop_cols) | set(self.auto_drop_)\n",
-    "        self.kept_columns_ = [c for c in X.columns if c in Xdf.columns and c not in drop_set]\n",
-    "\n",
-    "        # Build column transformer\n",
-    "        used_num = [c for c in self.num_cols if c in self.kept_columns_ and c not in self.auto_drop_]\n",
-    "        used_cat = [c for c in self.cat_cols if c in self.kept_columns_]\n",
-    "\n",
-    "        num_pipe = Pipeline([\n",
-    "            (\"imputer\", SimpleImputer(strategy=\"median\")),\n",
-    "            (\"scaler\", StandardScaler())\n",
-    "        ])\n",
-    "        cat_pipe = Pipeline([\n",
-    "            (\"imputer\", SimpleImputer(strategy=\"most_frequent\")),\n",
-    "            (\"ohe\", OneHotEncoder(handle_unknown=\"ignore\", drop=\"if_binary\", sparse_output=False))\n",
-    "        ])\n",
-    "\n",
-    "        self.prep_ = ColumnTranformer(\n",
-    "            transformer=[\n",
-    "                (\"num\", num_pipe, used_num),\n",
-    "                (\"cat\", cat_pipe, used_cat)\n",
-    "            ], remainder=\"drop\"\n",
-    "        ).fit(Xdf)\n",
-    "\n",
-    "        # Feature names\n",
-    "        names_num = used_num\n",
-    "        cat_ohe = self.prep_.named_transformers_[\"cat\"][\"ohe\"] if used_cat else None\n",
-    "        names_cat = cat_ohe.get_features_names_out(used_cat).tolist() if catohe is not None else []\n",
-    "        self.feature_names_ = names_num + names_cat # For viz later\n",
-    "        return self\n",
-    "        \n",
-    "    def transform(self, X):\n",
-    "        Xdf = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(X)\n",
-    "        Xdf.drop(columns=self.drop_cols+self.auto_drop_, errors=\"ignore\")\n",
-    "\n",
-    "        # Align to kept column order for new data\n",
-    "        Xdf = Xdf.reindex(columns=[c for c in self.kept_columns_ if c in Xdf.columns])\n",
-    "        return self.prep_transform(Xdf)"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.13.5"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+import pandas as pd
+import numpy as np
+
+# This is a scikit-learn model preprocessing pipeline
+class churn_preprocessor(BaseEstimator, TransformerMixin):
+    def __init__(self, drop_cols=None, corr_threshold=0.999, num_cols=None, cat_cols=None, remove_redundant=True):
+        '''Remove redundant features'''
+        self.drop_cols = drop_cols or []
+        self.corr_threshold = corr_threshold
+        self.num_cols = None if num_cols is None else list(num_cols)
+        self.cat_cols = None if cat_cols is None else list(cat_cols)
+        self.remove_redundant = remove_redundant
+
+        # Set in fit
+        self.auto_drop_ = []
+        self.kept_columns_ = []
+        self.prep_ = None
+        self.feature_names_ = []
+        self.corr_matrix_ = None
+
+    def num_for_corr(self, df: pd.DataFrame) -> pd.DataFrame:
+        '''Transform to numeric data to check correlation'''
+        df.num = df.copy()
+
+        # Convert object/categorical
+        for c in df_num.select_dtypes(include=["object","category"]).columns:
+            df_num[c] = pd.Categorical(df_num[c]).codes
+        return df_num.apply(pd.to_numeric, errors="coerce")
+
+    def _infer_column_types(self, Xdf: pd.DataFrame):
+        if self.num_cols is None or self.cat_cols is None:
+            num = Xdf.select_dtypes(include=[np.number]).columns.tolist()
+            cat = Xdf.columns.difference(num).tolist()
+            if self.num_cols is None: self.num_cols = num
+            if self.cat_cols is None: self.cat_cols = cat
+            
+    def _find_redundant(self, df_num: pd.DataFrame):
+        if df_num.shape[1] <= 1:
+            return []
+        corr = df_num.corr(numeric_only=True).abs()
+        self.corr_matrix_ = corr
+        upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+        to_drop = [col for col in upper.columns if any(upper[col] >= self.corr_threshold)]
+        return to_drop
+        
+    def fit(self, X, y=None):
+        Xdf = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(X)
+        # Drop useless columns
+        Xdf = Xdf.drop(columns=self.drop_cols, errors="ignore")
+        self._infer_column_types(Xdf)
+
+        # Remove highly correlated numeric columns
+        self.auto_drop_ = []
+        if self.remove_redundant and len(self.num_cols) > 1:
+            Xnum_for_corr = self.num_for_corr(Xdf[self.num_cols]).select_dtypes(include=[np.number])
+            redundant = self._find_redundant(Xnum_for_corr)
+            self.auto_drop_ = redundant
+
+        # Kept columns
+        crop_set = set(self.drop_cols) | set(self.auto_drop_)
+        self.kept_columns_ = [c for c in X.columns if c in Xdf.columns and c not in drop_set]
+
+        # Build column transformer
+        used_num = [c for c in self.num_cols if c in self.kept_columns_ and c not in self.auto_drop_]
+        used_cat = [c for c in self.cat_cols if c in self.kept_columns_]
+
+        num_pipe = Pipeline([
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler())
+        ])
+        cat_pipe = Pipeline([
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("ohe", OneHotEncoder(handle_unknown="ignore", drop="if_binary", sparse_output=False))
+        ])
+
+        self.prep_ = ColumnTranformer(
+            transformer=[
+                ("num", num_pipe, used_num),
+                ("cat", cat_pipe, used_cat)
+            ], remainder="drop"
+        ).fit(Xdf)
+
+        # Feature names
+        names_num = used_num
+        cat_ohe = self.prep_.named_transformers_["cat"]["ohe"] if used_cat else None
+        names_cat = cat_ohe.get_features_names_out(used_cat).tolist() if catohe is not None else []
+        self.feature_names_ = names_num + names_cat # For viz later
+        return self
+        
+    def transform(self, X):
+        Xdf = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(X)
+        Xdf.drop(columns=self.drop_cols+self.auto_drop_, errors="ignore")
+
+        # Align to kept column order for new data
+        Xdf = Xdf.reindex(columns=[c for c in self.kept_columns_ if c in Xdf.columns])
+        return self.prep_transform(Xdf)
