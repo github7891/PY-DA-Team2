@@ -78,7 +78,7 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
             ("ohe", OneHotEncoder(handle_unknown="ignore", drop="if_binary", sparse_output=False))
         ])
 
-        self.prep_ = ColumnTranformer(
+        self.prep_ = ColumnTransformer(
             transformer=[
                 ("num", num_pipe, used_num),
                 ("cat", cat_pipe, used_cat)
