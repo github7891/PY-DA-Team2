@@ -25,7 +25,7 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
 
     def num_for_corr(self, df: pd.DataFrame) -> pd.DataFrame:
         '''Transform to numeric data to check correlation'''
-        df.num = df.copy()
+        df_num = df.copy()
 
         # Convert object/categorical
         for c in df_num.select_dtypes(include=["object","category"]).columns:
