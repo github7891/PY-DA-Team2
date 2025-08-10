@@ -79,7 +79,7 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
         ])
 
         self.prep_ = ColumnTransformer(
-            transformer=[
+            transformers=[
                 ("num", num_pipe, used_num),
                 ("cat", cat_pipe, used_cat)
             ], remainder="drop"
