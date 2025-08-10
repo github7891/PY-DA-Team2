@@ -62,7 +62,7 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
             self.auto_drop_ = redundant
 
         # Kept columns
-        crop_set = set(self.drop_cols) | set(self.auto_drop_)
+        drop_set = set(self.drop_cols) | set(self.auto_drop_)
         self.kept_columns_ = [c for c in X.columns if c in Xdf.columns and c not in drop_set]
 
         # Build column transformer
