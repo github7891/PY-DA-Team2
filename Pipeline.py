@@ -88,7 +88,7 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
         # Feature names
         names_num = used_num
         cat_ohe = self.prep_.named_transformers_["cat"]["ohe"] if used_cat else None
-        names_cat = cat_ohe.get_features_names_out(used_cat).tolist() if catohe is not None else []
+        names_cat = cat_ohe.get_features_names_out(used_cat).tolist() if cat_ohe is not None else []
         self.feature_names_ = names_num + names_cat # For viz later
         return self
         
@@ -98,4 +98,4 @@ class churn_preprocessor(BaseEstimator, TransformerMixin):
 
         # Align to kept column order for new data
         Xdf = Xdf.reindex(columns=[c for c in self.kept_columns_ if c in Xdf.columns])
-        return self.prep_transform(Xdf)
+        return self.prep_.transform(Xdf)
