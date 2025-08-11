@@ -30,7 +30,7 @@ class ANN_tf:
         model.add(Dropout(0.2))
     
         # 2nd layer
-        model.add(Dense(units=hp.Int('units2', min_value=16, max_value=64, step=12), kernel_initializer = 'normal', activation = 'relu'))
+        model.add(Dense(units=hp.Int('units2', min_value=16, max_value=64, step=16), kernel_initializer = 'normal', activation = 'relu'))
         model.add(BatchNormalization())
         model.add(Dropout(0.2))
     
