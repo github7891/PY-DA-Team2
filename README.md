@@ -59,16 +59,16 @@ This folder is home for the `preprocessing.py`, `churn_predictor.py`, and the `m
 Additionally, it provides a switch for feature combination decision; at last, gather those columns `get_feature_names()` for future visualisations.
 
 ### churn_predictor.py
-**`ChurnPredictor`**: This class is the full NN workflow manager for predicting customer churn, covering data spitting, preprocessing, fine tuning, model training, evaluation, and saving artefacts.
+**`ChurnPredictor`**: This class is the full NN workflow manager for predicting customer churn, covering data spitting, preprocessing, fine tuning, model training, and evaluation.
 
 `Hyperparameter Tuning(tune(), pick_best_params())`: Uses Keras tuner with Hyperband search to find the best neural network architecture and parameters based on validation metrics (accuracy and AUPRC).
 
-`Training(fit_final())`: Trains the final nn model with optional GPU usage, mixed precision for speed, class weighting, and early stopping. It can also save the trained model.
+`fit_final()`: Trains the final nn model with optional GPU usage, mixed precision for speed, class weighting, and early stopping. It can also save the trained model.
 
-`Saving Artefacts(save_artefacts)`: Saves the preprocessor, scaler, and best hyperparameters for future model reuse without retraining.
+`fit_with_tensorboard()`: This function trains the model while integrating TensorBoard logging and early stopping, using the best hyperparameters discovered during tuning.
 
 ### main.py
-This script runs the entire churn prediction process and apply mix approches for better performance.
+This script runs the entire churn prediction process and apply mix approches for better performance. It includes an optional checkpoint to call saved parameters for future fitting without retuning.
 
 ## models
 ### model.py
