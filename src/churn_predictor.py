@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 from pathlib import Path
 from sklearn.base import BaseEstimator, TransformerMixin
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, Callback
 
 import sys, os
 sys.path.append(os.path.abspath(".."))
@@ -60,7 +60,7 @@ class ChurnPredictor:
 
     def tune(self, X_tr, y_tr, X_va, y_va, project_name='krs_hyperband'):
         self.tuner = make_tuner(input_dim=X_tr.shape[1], project_name=project_name)
-        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=8, restore_best_weights=True)
+        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_auprc', mode='max', patience=8, restore_best_weights=True)
         self.tuner.search(X_tr, y_tr, validation_data=(X_va, y_va), callbacks=[early_stop], verbose=1)
         self.best_hp = self.tuner.get_best_hyperparameters(1)[0]
         return self.best_hp
@@ -98,8 +98,8 @@ class ChurnPredictor:
             
         tf.keras.backend.clear_session()
         self.model = build_model(X_tr.shape[1], **best_params)
-        callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=12, restore_best_weights=True),
-                    ReduceLROnPlateau(monitor='val_loss', mode='min', factor=0.5, patience=4, verbose=0),
+        callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_auprc', mode='max', patience=8, restore_best_weights=True),
+                    ReduceLROnPlateau(monitor='val_auprc', mode='max', factor=0.5, patience=4, verbose=0),
                     # Keep max auprc
                     ModelCheckpoint("models/best_churn_model.keras", monitor='val_auprc', mode='max', save_best_only=True)]
 
@@ -146,3 +146,25 @@ class ChurnPredictor:
         if self.best_hp is not None:
             with open(params_path, 'w', encoding='utf-8') as f:
                 json.dump({k:self.best_hp.get(k) for k in ['units1', 'units2', 'units3', 'lr'] if self.best_hp.get(k) is not None}, f, indent=2)
+
+    # Fit with tensorboard
+    def fit_with_tensorboard(self, X_train, y_train, X_val, y_val, 
+                             best_params:dict, 
+                             epochs:int, batch_size:int, class_weights=None, 
+                             tb_cb:Callback | None=None):
+        tf.keras.backend.clear_session()
+        self.model = build_model(X_train.shape[1], **best_params)
+        cbs = [tf.keras.callbacks.EarlyStopping(monitor='val_auprc', mode='max', patience=8, restore_best_weights=True)]
+        if tb_cb is not None:
+            cbs.append(tb_cb)
+        
+        history = self.model.fit(
+            X_train, y_train, 
+            validation_data=(X_val, y_val), 
+            epochs=epochs, 
+            batch_size=batch_size, 
+            class_weight=class_weights, 
+            callbacks=cbs, 
+            verbose=0
+        )
+        return history
