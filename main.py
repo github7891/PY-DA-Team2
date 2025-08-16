@@ -26,7 +26,7 @@ from tensorflow.keras.callbacks import TensorBoard
 
 # Tensorboard callback
 log_dir = Path('logs')/("integrate_run"+datetime.datetime.now().strftime('%d%m%Y-%H%M%S'))
-tb_cb = TensorBoard(log_dir=str(log_dir), histogram_freq=1)
+tb_cb = TensorBoard(log_dir=str(log_dir), histogram_freq=1, write_graph=True, write_images=True)
 
 os.environ["PYTHONHASHSEED"] = str(Config.SEED)
 random.seed(Config.SEED)
@@ -166,4 +166,5 @@ with writer.as_default():
 
 # Load Tensorboard in Jupyter
 %load_ext tensorboard
+
 %tensorboard --logdir logs
