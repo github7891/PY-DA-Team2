@@ -267,3 +267,9 @@ get_ipython().run_line_magic('reload_ext', 'tensorboard')
 get_ipython().run_line_magic('tensorboard', '--logdir logs --port 6008')
 
 
+# In[28]:
+
+
+# Save models
+joblib.dump(gb_cal, "gb_cal_model.pkl")
+cp.model.save("nn_model.keras")
