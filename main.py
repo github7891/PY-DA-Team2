@@ -30,10 +30,6 @@ from src.preprocessing import build_preprocessor, PreprocessConfig
 from config import Config
 from models.model import build_gb, calibrate_prefit
 
-# For viz
-import eli5
-from eli5.sklearn import PermutationImportance
-from IPython.display import display
 from tensorflow.keras.callbacks import TensorBoard
 
 
@@ -269,4 +265,5 @@ model.summary()
 # Load Tensorboard in Jupyter
 get_ipython().run_line_magic('reload_ext', 'tensorboard')
 get_ipython().run_line_magic('tensorboard', '--logdir logs --port 6008')
+
 
