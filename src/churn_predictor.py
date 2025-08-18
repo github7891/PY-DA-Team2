@@ -133,20 +133,6 @@ class ChurnPredictor:
     def predict_proba(self, X):
         return self.model.predict(X, verbose=0).ravel()
 
-    def save_artifacts(self, model_path: Path, scaler_path: Path, params_path: Path):
-        # Save model
-        if self.model is None:
-            raise RuntimeError("Model not trained")
-        self.model.save(str(model_path))
-
-        # Save preprocessor
-        joblib.dump(self.preprocessor, scaler_path)
-
-        # Save best hp
-        if self.best_hp is not None:
-            with open(params_path, 'w', encoding='utf-8') as f:
-                json.dump({k:self.best_hp.get(k) for k in ['units1', 'units2', 'units3', 'lr'] if self.best_hp.get(k) is not None}, f, indent=2)
-
     # Fit with tensorboard
     def fit_with_tensorboard(self, X_train, y_train, X_val, y_val, 
                              best_params:dict, 
@@ -155,6 +141,7 @@ class ChurnPredictor:
         tf.keras.backend.clear_session()
         self.model = build_model(X_train.shape[1], **best_params)
         cbs = [tf.keras.callbacks.EarlyStopping(monitor='val_auprc', mode='max', patience=8, restore_best_weights=True)]
+        
         if tb_cb is not None:
             cbs.append(tb_cb)
         

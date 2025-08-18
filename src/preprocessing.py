@@ -46,11 +46,13 @@ class PreprocessConfig:
     corr_threshold: float | None = None # None if no correlation dropping
     expect_numeric: bool = True # False if categorical exist
 
-def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig, include_interactions: bool=True) -> tuple[Pipeline, callable]:
+def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig, include_interactions: bool=True):
+
     X = df.copy()
     if cfg.drop_cols:
-        X.drop(columns=[c for c in cfg.drop_cols if c in X.columns], errors='ignore', inplace=True)
-    
+        X = X.drop(columns = [c for c in cfg.drop_cols if c in X.columns], errors="ignore")
+    num_cols = X.select_dtypes(include=np.number).columns.tolist()
+    cat_cols = [] if cfg.expect_numeric else X.select_dtypes(include=['object','category','bool']).columns.tolist()
     # Pipelines
     num_pipe = Pipeline([
         ('imputer', SimpleImputer(strategy='median')), 
@@ -61,22 +63,18 @@ def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig, include_interactio
         ('ohe', OneHotEncoder(handle_unknown='ignore', drop='if_binary', sparse_output=False))
     ])
 
-    # Selectors
-    num_sel = make_column_selector(dtype_include=np.number)
-    cat_sel = make_column_selector(dtype_include=['object','category','bool']) if not cfg.expect_numeric else []
-
+    transformers = []
+    if num_cols:
+        transformers.append(('num', num_pipe, num_cols))
+    if cat_cols:
+        transformers.append(('cat', cat_pipe, cat_cols))
     ct = ColumnTransformer(
-        transformers=[
-            ('num', num_pipe, num_sel), 
-            ('cat', cat_pipe, cat_sel)], 
+        transformers=transformers, 
         remainder='drop',
         verbose_feature_names_out=False
     )
 
-    steps = []
-    if include_interactions:
-        steps.append(('fe', FeatureEngineer()))
-    steps.append(('ct', ct))
+    steps = [('ct', ct)]
 
     # Full pipeline
     preprocessor = Pipeline(steps)
