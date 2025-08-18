@@ -31,6 +31,7 @@ Numpy version: 2.1.3
 TensorFlow version: 2.20.0-rc0
 Scikit-learn version: 1.6.1
 Keras Tuner version: 1.0.5
+Eli5 version: 0.16.0
 ```
 
 The structure of this project includes a main folder named **project** and the subfolders as follows
