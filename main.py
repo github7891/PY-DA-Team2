@@ -178,8 +178,8 @@ model.summary()
 %tensorboard --logdir logs --port 6008
 
 # Save model
-joblib.dump(gb_cal, "gb_cal_model.pkl")
-cp.model.save("nn_model.keras")
+joblib.dump(gb_cal, "models/gb_cal_model.pkl")
+cp.model.save("models/models/nn_model.keras")
 
 # Save predictions
 gb_train = gb_cal.predict_proba(X_tr_st)[:,1]
@@ -201,7 +201,8 @@ test_df = pd.DataFrame({
     "gb_test": gb_test
 })
 
-train_df.to_csv("preds_train.csv", index=False)
-valid_df.to_csv("preds_valid.csv", index=False)
+train_df.to_csv("datasets/preds_train.csv", index=False)
+valid_df.to_csv("datasets/preds_valid.csv", index=False)
 
-test_df.to_csv("preds_test.csv", index=False)
+test_df.to_csv("datasets/preds_test.csv", index=False)
+
