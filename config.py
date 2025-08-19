@@ -18,8 +18,6 @@ class Config:
     MODELS_DIR = ROOT/"models"
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     
-    MODEL_PATH = MODELS_DIR/"model.keras"
-    SCALER_PATH = MODELS_DIR/"scaler.joblib"
     PARAMS_PATH = MODELS_DIR/"best_param.json"
     
     # Split (default)
@@ -31,3 +29,4 @@ class Config:
     EPOCHS = 50
     EARLY_STOP_PATIENCE = 10
     MIN_VAL_ACCURACY = 0.8
+
