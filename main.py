@@ -161,6 +161,15 @@ print(f"AUPRC: {auprc_te:.4f}")
 print(f"[TEST-acc_thr] Accuracy: {acc_te_acc:.4f} | F1: {f1_te_acc:.4f}")
 print(f"[TEST-f1_thr] Accuracy: {acc_te_f1:.4f} | F1: {f1_te_f1:.4f}")
 
+# Save best threshold
+thresholds = {
+        "f1": float(best_thr_f1),
+        "acc": float(best_thr_acc)
+}
+
+with open("best_threshold.json", 'w') as f:
+    json.dump(thresholds, f, indent=4)
+
 model = cp.model
 model.summary()
 
@@ -194,4 +203,5 @@ test_df = pd.DataFrame({
 
 train_df.to_csv("preds_train.csv", index=False)
 valid_df.to_csv("preds_valid.csv", index=False)
+
 test_df.to_csv("preds_test.csv", index=False)
