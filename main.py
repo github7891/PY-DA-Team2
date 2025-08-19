@@ -178,7 +178,7 @@ model.summary()
 %tensorboard --logdir logs --port 6008
 
 # Save model
-joblib.dump(gb_cal, "models/gb_cal_model.pkl")
+joblib.dump(gb_cal, "models/models/gb_cal_model.pkl")
 cp.model.save("models/models/nn_model.keras")
 
 # Save predictions
@@ -205,4 +205,5 @@ train_df.to_csv("datasets/preds_train.csv", index=False)
 valid_df.to_csv("datasets/preds_valid.csv", index=False)
 
 test_df.to_csv("datasets/preds_test.csv", index=False)
+
 
