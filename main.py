@@ -178,9 +178,13 @@ model.summary()
 %tensorboard --logdir logs --port 6008
 
 # Save splits
-X_train_full.to_csv("datasets/X_train_full.csv", index=False)
-X_valid.to_csv("datasets/X_valid.csv", index=False)
-X_test.to_csv("datasets/X_train_full.csv", index=False)
+np.save("datasets/X_train_preproc.npy", X_tr)
+np.save("datasets/X_valid_preproc.npy", X_va)
+np.save("datasets/X_test_preproc.npy", X_te)
+
+# Save feature names
+with open("datasets/feature_names.json", 'w') as f:
+    json.dump(feature_names, f, indent=2)
 
 # Save model
 joblib.dump(gb_cal, "gb_cal_model.pkl")
