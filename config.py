@@ -29,4 +29,3 @@ class Config:
     EPOCHS = 50
     EARLY_STOP_PATIENCE = 10
     MIN_VAL_ACCURACY = 0.8
-
