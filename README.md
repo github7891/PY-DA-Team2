@@ -38,12 +38,12 @@ The structure of this project includes a main folder named **project** and the s
 ```  
  project/
 ├─ config.py
+├─ main.py/ipynb
 ├─ models/
 │  └─model.py
 ├─ src/
 │  ├─ preprocessing.py
-│  ├─ churn_predictor.py                 
-│  └─ main.py       
+│  └─churn_predictor.py                   
 └─ tests/
    └─ test.py    
 ```
