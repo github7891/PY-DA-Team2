@@ -120,7 +120,7 @@ class ChurnPredictor:
         return results
 
     def predict_proba(self, X):
-        return self.model.predict(X, verbose=0).ravel()
+        return self.model.predict(X, verbose=0).reshape(-1)
 
     # Fit with tensorboard
     def fit_with_tensorboard(self, X_train, y_train, X_val, y_val, 
@@ -143,4 +143,5 @@ class ChurnPredictor:
             callbacks=cbs, 
             verbose=0
         )
+
         return history
