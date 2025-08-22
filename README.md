@@ -38,6 +38,7 @@ The structure of this project includes a main folder named **project** and the s
 ```  
  project/
 ├─ config.py
+├─ datasets
 ├─ main.py/ipynb
 ├─ models/
 │  └─model.py
@@ -49,7 +50,7 @@ The structure of this project includes a main folder named **project** and the s
 ```
 
 ## src
-This folder is home for the `preprocessing.py`, `churn_predictor.py`, and the `main.py` script that calls the transformers from those files.
+This folder is home for the `preprocessing.py` and `churn_predictor.py` script that calls the transformers and run through the churn prediction process.
 
 ### preprocessing.py
 **`FeatureEngineer`**: This class controls the feature interactions, the new features one wish to add to the model training can be defined from here.
@@ -68,8 +69,8 @@ Additionally, it provides a switch for feature combination decision; at last, ga
 
 `fit_with_tensorboard()`: This function trains the model while integrating TensorBoard logging and early stopping, using the best hyperparameters discovered during tuning.
 
-### main.py
-This script runs the entire churn prediction process and apply mix approches for better performance. It includes an optional checkpoint to call saved parameters for future fitting without retuning.
+## datasets
+This is a folder that saves the optional splits for future visualisation.
 
 ## models
 ### model.py
