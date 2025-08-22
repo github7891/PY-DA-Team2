@@ -13,13 +13,6 @@ class Config:
        "feature-engineer/data-preprocessing/data/processed/"
        "Dataset_ATS_v2_processed.csv")
     
-    # Model artefact
-    ROOT = Path(__file__).resolve().parents[1]
-    MODELS_DIR = ROOT/"models"
-    MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    
-    PARAMS_PATH = MODELS_DIR/"best_param.json"
-    
     # Split (default)
     VAL_SIZE = 0.15
     TEST_SIZE = 0.3
