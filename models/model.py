@@ -9,7 +9,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.calibration import CalibratedClassifierCV
 
 # Build keras model
-def build_model(input_dim, units1=32, units2=16, lr=1e-3, l2=1e-4, drop=0.2):
+def build_model(input_dim:int, units1=32, units2=16, lr=1e-3, l2=1e-4, drop=0.2):
     # Initialise ANN
     model = Sequential()
     
@@ -31,7 +31,7 @@ def build_model(input_dim, units1=32, units2=16, lr=1e-3, l2=1e-4, drop=0.2):
     
     return model 
 
-def hypermodel(hp, input_dim):
+def hypermodel(hp, input_dim:int):
     u1 = hp.Int('units1', min_value=16, max_value=64, step=16)
     u2 = hp.Int('units2', min_value=8, max_value=32, step=8)
     lr = hp.Float('lr', 2e-4, 2e-3, sampling='log')
@@ -52,7 +52,7 @@ def make_tuner(input_dim:int, project_name='krs_hyperband', directory='hyperband
         overwrite=True)
     return tuner
 
-def build_gb(random_state=42, **kwargs) -> GradientBoostingClassifier:
+def build_gb(random_state:int=42, **kwargs) -> GradientBoostingClassifier:
     return GradientBoostingClassifier(random_state=random_state, **kwargs)
 
 def calibrate_prefit(estimator, X_valid, y_valid, method='isotonic') -> CalibratedClassifierCV:
@@ -60,3 +60,4 @@ def calibrate_prefit(estimator, X_valid, y_valid, method='isotonic') -> Calibrat
     cal.fit(X_valid, y_valid)
 
     return cal
+
