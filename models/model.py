@@ -55,9 +55,10 @@ def make_tuner(input_dim:int, project_name='krs_hyperband', directory='hyperband
 def build_gb(random_state:int=42, **kwargs) -> GradientBoostingClassifier:
     return GradientBoostingClassifier(random_state=random_state, **kwargs)
 
-def calibrate_prefit(estimator, X_valid, y_valid, method='isotonic') -> CalibratedClassifierCV:
+def calibrate_prefit(estimator, X_valid, y_valid, method:str='isotonic') -> CalibratedClassifierCV:
     cal = CalibratedClassifierCV(estimator=estimator, method=method, cv='prefit')
     cal.fit(X_valid, y_valid)
 
     return cal
+
 
