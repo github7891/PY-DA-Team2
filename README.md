@@ -70,7 +70,7 @@ Additionally, it provides a switch for feature combination decision; at last, ga
 `fit_with_tensorboard()`: This function trains the model while integrating TensorBoard logging and early stopping, using the best hyperparameters discovered during tuning.
 
 ## datasets
-This is a folder that saves the optional splits for future visualisation.
+This is a folder that saves the optional splits and predictions for future visualisation.
 
 ## models
 ### model.py
