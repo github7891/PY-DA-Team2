@@ -80,7 +80,10 @@ class ChurnPredictor:
         class_weight='balanced', 
         classes=classes, 
         y=y)
-        return dict(enumerate(w))
+        weights_dict = {}
+        for i in range(len(w)):
+            weights_dict[i] = w[1]
+        return weights_dict
 
     def fit_final(self, X_tr, y_tr, X_va, y_va, 
                   best_params:dict, epochs=50, batch_size=32, class_weights=None, 
@@ -145,4 +148,5 @@ class ChurnPredictor:
         )
 
         return history
+
 
