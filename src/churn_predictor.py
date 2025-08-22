@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import time
 import tensorflow as tf
 import json, joblib
 from pathlib import Path
@@ -20,18 +19,13 @@ from models.model import build_model, make_tuner
 from config import Config
 
 class ChurnPredictor:
-    def __init__(self, drop_cols=None, corr_threshold=None, expect_numeric=True):
-        self.cfg = PreprocessConfig(drop_cols=drop_cols, corr_threshold=corr_threshold, expect_numeric=expect_numeric)
+    def __init__(self, drop_cols=None, expect_numeric=True):
+        self.cfg = PreprocessConfig(drop_cols=drop_cols, expect_numeric=expect_numeric)
         self.preprocessor = None
         self.feature_names_ = None
         self.tuner = None
         self.best_hp = None
         self.model = None
-
-        # Model artefacts
-        self.model_path = Path(Config.MODEL_PATH)
-        self.scaler_path = Path(Config.SCALER_PATH)
-        self.params_path = Path(Config.PARAMS_PATH)
 
     def split(self, df:pd.DataFrame, y_col: str="Churn", test_size: float=0.30, val_size: float=0.15, seed: int=42):
         X_df = df.drop(columns=[y_col])
@@ -104,7 +98,7 @@ class ChurnPredictor:
                     ModelCheckpoint("models/best_churn_model.keras", monitor='val_auprc', mode='max', save_best_only=True)]
 
         device_name = '/GPU:0' if (use_gpu and tf.config.list_physical_devices('GPU')) else 'CPU:0' # Choose device if available
-        start = time.perf_counter()
+
         with tf.device(device_name):
             history = self.model.fit(X_tr, y_tr, 
                     validation_data=(X_va, y_va), 
@@ -113,13 +107,8 @@ class ChurnPredictor:
                     callbacks=callbacks, 
                     class_weight=class_weights,
                     verbose=0)
-        train_time_sec = time.perf_counter() - start
-
-        # Save best model
-        if save_path:
-            self.model.save(save_path)
             
-        return history, train_time_sec
+        return history
 
     def evaluate(self, X_te, y_te):
         results = self.model.evaluate(X_te, y_te, verbose=0)

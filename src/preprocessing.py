@@ -7,46 +7,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.base import BaseEstimator, TransformerMixin
 
-class FeatureEngineer(BaseEstimator, TransformerMixin):
-    # Self-define features
-    def __init__(self):
-        self.new_cols_ = []
-
-    def fit(self, X, y=None):
-        Xc = X.copy()
-        cols = set(Xc.columns)
-
-        # Only create features if column exist
-        if {"MonthlyCharges", "tenure"}.issubset(cols):
-            self.new_cols_.append(("MCxTenure", "MonthlyCharges", "tenure"))
-        if {"Dependents", "Contract_Two year"}.issubset(cols):
-            self.new_cols_.append(("Dependents_x_TwoYear", "Dependents", "Contract_Two year"))
-        if {"Dependents", "Contract_One year"}.issubset(cols):
-            self.new_cols_.append(("Dependents_x_OneYear", "Dependents", "Contract_One year"))
-        if {"PhoneService", "MultipleLines"}.issubset(cols):
-            self.new_cols_.append(("Phone_x_Multi", "PhoneService", "MultipleLines"))
-        if {"InternetService_Fiber optic", "MonthlyCharges"}.issubset(cols):
-            self.new_cols_.append(("Fiber_x_Charges", "InternetService_Fiber optic", "MonthlyCharges"))
-        if {"SeniorCitizen", "Contract_One year"}.issubset(cols):
-            self.new_cols_.append(("Senior_x_OneYear", "SeniorCitizen", "Contract_One year"))
-            
-        return self
-
-    def transform(self, X):
-        Xc = X.copy()
-
-        for new_name, a, b in self.new_cols_:
-            Xc[new_name] = Xc[a]*Xc[b]
-
-        return Xc
-
 @dataclass
 class PreprocessConfig:
     drop_cols: list | None = None
-    corr_threshold: float | None = None # None if no correlation dropping
     expect_numeric: bool = True # False if categorical exist
 
-def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig, include_interactions: bool=True):
+def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig):
 
     X = df.copy()
     if cfg.drop_cols:
