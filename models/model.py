@@ -9,19 +9,19 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.calibration import CalibratedClassifierCV
 
 # Build keras model
-def build_model(input_dim:int, units1=32, units2=16, lr=1e-3, l2=1e-4, drop=0.3):
+def build_model(input_dim:int, units1=32, units2=16, lr=1e-3, l2=1e-4, drop=0.2):
     # Initialise ANN
     model = Sequential()
     
     # Input layer and 1st hidden layer
     model.add(Dense(units1, kernel_initializer='he_uniform', activation='relu', input_shape=(input_dim,), kernel_regularizer=reg.l2(l2)))
     model.add(BatchNormalization())
-    model.add(Dropout(0.2))
+    model.add(Dropout(drop))
     
     # 2nd layer
     model.add(Dense(units2, kernel_initializer='he_uniform', activation='relu', kernel_regularizer=reg.l2(l2)))
     model.add(BatchNormalization())
-    model.add(Dropout(0.2))
+    model.add(Dropout(drop))
     
     # Output layer
     model.add(Dense(1, kernel_initializer='glorot_uniform', activation='sigmoid'))
