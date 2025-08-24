@@ -83,4 +83,4 @@ This script defines and configures the keras models used in churn prediction pip
 `calibrate_prefit()`: Wraps a fitted classifier with calibration to adjust predicted probabilities to reach a target accuracy.
 
 ## datasets
-Prediction files are saved in this folder for visualisation.
+Files are saved in this folder for visualisation.
