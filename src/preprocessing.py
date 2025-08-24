@@ -19,6 +19,7 @@ def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig):
         X = X.drop(columns = [c for c in cfg.drop_cols if c in X.columns], errors="ignore")
     num_cols = X.select_dtypes(include=np.number).columns.tolist()
     cat_cols = [] if cfg.expect_numeric else X.select_dtypes(include=['object','category','bool']).columns.tolist()
+    
     # Pipelines
     num_pipe = Pipeline([
         ('imputer', SimpleImputer(strategy='median')), 
@@ -45,7 +46,7 @@ def build_preprocessor(df:pd.DataFrame, cfg:PreprocessConfig):
     # Full pipeline
     preprocessor = Pipeline(steps)
 
-    # Post transform - drop highly correlated cols
+    # Post transform - feature list
     def get_feature_names() -> list[str]:
         return preprocessor.named_steps['ct'].get_feature_names_out().tolist()
 

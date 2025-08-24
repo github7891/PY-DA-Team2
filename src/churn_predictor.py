@@ -146,7 +146,4 @@ class ChurnPredictor:
             callbacks=cbs, 
             verbose=0
         )
-
         return history
-
-
