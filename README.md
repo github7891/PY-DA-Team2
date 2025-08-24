@@ -28,10 +28,11 @@ If you are not working in a virtual environment, the library versions for this p
 ```
 Pandas version: 2.2.3
 Numpy version: 2.1.3
-TensorFlow version: 2.20.0-rc0
+TensorFlow version: 2.20.0
 Scikit-learn version: 1.6.1
 Keras Tuner version: 1.0.5
-Eli5 version: 0.16.0
+Matplot version: 3.10.0
+Seaborn version: 0.13.2
 ```
 
 The structure of this project includes a main folder named **project** and the subfolders as follows
@@ -82,5 +83,5 @@ This script defines and configures the keras models used in churn prediction pip
 
 `calibrate_prefit()`: Wraps a fitted classifier with calibration to adjust predicted probabilities to reach a target accuracy.
 
-## datasets
-Files are saved in this folder for visualisation.
+## viz.py
+Some visualisations for business analysis.
