@@ -58,7 +58,4 @@ def build_gb(random_state:int=42, **kwargs) -> GradientBoostingClassifier:
 def calibrate_prefit(estimator, X_valid, y_valid, method:str='isotonic') -> CalibratedClassifierCV:
     cal = CalibratedClassifierCV(estimator=estimator, method=method, cv='prefit')
     cal.fit(X_valid, y_valid)
-
     return cal
-
-
