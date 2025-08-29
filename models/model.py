@@ -36,7 +36,7 @@ def hypermodel(hp, input_dim:int):
     u2 = hp.Int('units2', min_value=8, max_value=32, step=8)
     lr = hp.Float('lr', 2e-4, 2e-3, sampling='log')
     l2 = hp.Float('l2', 2e-4, 2e-3, sampling='log')
-    dr = hp.Float('drop', 0.25, 0.4, step=0.5)
+    dr = hp.Float('drop', 0.25, 0.4, step=0.05)
     return build_model(input_dim, u1, u2, lr, l2, dr)
 
 def make_tuner(input_dim:int, project_name='krs_hyperband', directory='hyperband'):
@@ -58,4 +58,5 @@ def build_gb(random_state:int=42, **kwargs) -> GradientBoostingClassifier:
 def calibrate_prefit(estimator, X_valid, y_valid, method:str='isotonic') -> CalibratedClassifierCV:
     cal = CalibratedClassifierCV(estimator=estimator, method=method, cv='prefit')
     cal.fit(X_valid, y_valid)
+
     return cal
